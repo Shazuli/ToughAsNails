@@ -15,6 +15,7 @@ import toughasnails.api.TANCapabilities;
 import toughasnails.api.stat.StatHandlerBase;
 import toughasnails.api.stat.capability.IThirst;
 import toughasnails.api.config.GameplayOption;
+import toughasnails.handler.compat.WitcheryTransformations;
 import toughasnails.network.message.MessageUpdateStat;
 
 public class ThirstHandler extends StatHandlerBase implements IThirst
@@ -38,7 +39,7 @@ public class ThirstHandler extends StatHandlerBase implements IThirst
     @Override
     public void update(EntityPlayer player, World world, Phase phase)
     {  
-    	if (!SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST) || player.isCreative())
+    	if (!SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST) || WitcheryTransformations.isVampire(player) || player.isCreative())
     	    return;
 
         if (phase == Phase.START)

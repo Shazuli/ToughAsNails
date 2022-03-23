@@ -4,29 +4,31 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.MobEffects;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import toughasnails.api.TANCapabilities;
 import toughasnails.api.TANPotions;
 import toughasnails.api.config.GameplayOption;
 import toughasnails.api.config.SyncedConfig;
-import toughasnails.api.config.TemperatureOption;
 import toughasnails.api.stat.StatHandlerBase;
 import toughasnails.api.stat.capability.ITemperature;
 import toughasnails.api.temperature.*;
 import toughasnails.api.temperature.TemperatureScale.TemperatureRange;
+import toughasnails.handler.compat.TransformationModifier;
+import toughasnails.handler.compat.WitcheryTransformations;
 import toughasnails.network.message.MessageUpdateStat;
 import toughasnails.temperature.modifier.*;
 import toughasnails.temperature.modifier.TemperatureModifier.ExternalModifier;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static toughasnails.api.temperature.TemperatureHelper.registerTemperatureModifier;
@@ -49,6 +51,7 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
         registerTemperatureModifier(new ObjectProximityModifier("object_proximity"));
         registerTemperatureModifier(new WeatherModifier("weather"));
         registerTemperatureModifier(new TimeModifier("time"));
+        registerTemperatureModifier(new TransformationModifier("transformation"));
     }
 
     public TemperatureHandler()
@@ -76,8 +79,7 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
             debugger.changeTicks = tempChangeTicks;
 
             Iterator<Map.Entry<String, ExternalModifier>> it = externalModifiers.entrySet().iterator();
-
-            List<String> toRemove=new ArrayList<String>();
+            List<String> toRemove=new ArrayList<>();
 
             while (it.hasNext())
             {
@@ -153,8 +155,17 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
         {
             if (this.temperatureLevel <= hypoRangeStart && (!player.isPotionActive(TANPotions.cold_resistance)) && (temperatureLevel < prevTemperatureLevel || !player.isPotionActive(TANPotions.hypothermia)))
             {
-                player.removePotionEffect(TANPotions.hypothermia);
-                player.addPotionEffect(new PotionEffect(TANPotions.hypothermia, 200, 0));
+
+                if (WitcheryTransformations.isVampire(player)) {
+                    player.removePotionEffect(MobEffects.SLOWNESS);
+                    player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 200, 0));
+
+                    player.removePotionEffect(MobEffects.MINING_FATIGUE);
+                    player.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 200, 0));
+                } else {
+                    player.removePotionEffect(TANPotions.hypothermia);
+                    player.addPotionEffect(new PotionEffect(TANPotions.hypothermia, 200, 0));
+                }
             }
             else if (this.temperatureLevel >= hyperRangeStart && (!player.isPotionActive(TANPotions.heat_resistance)) && (temperatureLevel > prevTemperatureLevel || !player.isPotionActive(TANPotions.hyperthermia)))
             {

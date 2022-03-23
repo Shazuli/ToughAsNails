@@ -35,6 +35,7 @@ import toughasnails.api.thirst.WaterType;
 import toughasnails.config.json.DrinkData;
 import toughasnails.fluids.blocks.BlockPurifiedWaterFluid;
 import toughasnails.handler.PacketHandler;
+import toughasnails.handler.compat.WitcheryTransformations;
 import toughasnails.init.ModConfig;
 import toughasnails.network.message.MessageDrinkWaterInWorld;
 import toughasnails.thirst.ThirstHandler;
@@ -68,7 +69,7 @@ public class DrinkHandler
                     if (PotionUtils.getFullEffectsFromItem(stack).isEmpty())
                     {
                         thirstHandler.addStats(WaterType.NORMAL.getThirst(), WaterType.NORMAL.getHydration());
-                        if (player.world.rand.nextFloat() < WaterType.NORMAL.getPoisonChance() && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST))
+                        if (!WitcheryTransformations.isWerewolf(player) && player.world.rand.nextFloat() < WaterType.NORMAL.getPoisonChance() && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST) && WitcheryTransformations.isVampire(player))
                         {
                             player.addPotionEffect(new PotionEffect(TANPotions.thirst, 600));
                         }

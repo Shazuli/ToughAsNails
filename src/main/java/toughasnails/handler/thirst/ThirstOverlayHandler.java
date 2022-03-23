@@ -12,7 +12,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -20,6 +19,7 @@ import toughasnails.api.TANCapabilities;
 import toughasnails.api.TANPotions;
 import toughasnails.api.config.GameplayOption;
 import toughasnails.api.config.SyncedConfig;
+import toughasnails.handler.compat.WitcheryTransformations;
 import toughasnails.thirst.ThirstHandler;
 
 public class ThirstOverlayHandler
@@ -57,7 +57,7 @@ public class ThirstOverlayHandler
             //When the update counter isn't incrementing, ensure the same numbers are produced (freezes moving gui elements)
             random.setSeed((long)(updateCounter * 312871));
     
-            if (minecraft.playerController.gameIsSurvivalOrAdventure())
+            if (minecraft.playerController.gameIsSurvivalOrAdventure() && !WitcheryTransformations.isVampire(player))
             {
                 minecraft.getTextureManager().bindTexture(OVERLAY);
                 drawThirst(width, height, thirstLevel, thirstHydrationLevel);
